@@ -92,7 +92,25 @@ const db: DbItem[] = [
 ];
 
 export const getAllPosts = async () => {
-  return db;
+  try {
+    const queryText = "SELECT * FROM user_posts";
+    const queryResponse = await client.query(queryText);
+    const posts = queryResponse.rows;
+    return posts;
+  } catch (error) {
+    console.error("There was an error getting all posts: ", error);
+  }
+};
+
+export const getAllThoughtPosts = async () => {
+  try {
+    const queryText = "SELECT * FROM WHERE category = 'thought' user_posts";
+    const queryResponse = await client.query(queryText);
+    const posts = queryResponse.rows;
+    return posts;
+  } catch (error) {
+    console.error("There was an error getting all posts: ", error);
+  }
 };
 
 export const addNewPost = async (newPostData: INewPostData, userId: string) => {

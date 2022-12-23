@@ -40,12 +40,14 @@ app.get("/art", (req, res) => {
 
 //============POST============
 app.post<{}, {}, INewPostData>("/write", async (req, res) => {
-  if (req.headers.authorization) {
-    const createdPost = await addNewPost(req.body, req.headers.authorization);
-    if (createdPost) {
-      res.json(createdPost);
-    } else {
-      res.status(400);
+  {
+    if (req.headers.authorization) {
+      const createdPost = await addNewPost(req.body, req.headers.authorization);
+      if (createdPost) {
+        res.json(createdPost);
+      } else {
+        res.status(400);
+      }
     }
   }
 });
