@@ -11,7 +11,7 @@ export interface DbItem {
   img: string;
   title: string;
   content: string;
-  type: PostType;
+  category: PostType;
   privacy: PostPrivacy;
   hearts: number;
   creation_date: string;
@@ -24,7 +24,7 @@ export interface INewPostData {
   img: string | null;
   title: string;
   content: string;
-  type: PostType | null;
+  category: PostType | null;
   privacy: PostPrivacy | null;
 }
 
@@ -93,7 +93,7 @@ export const addNewPost = async (newPostData: INewPostData, userId: string) => {
       newPostData.title,
       newPostData.content,
       newPostData.img,
-      newPostData.type,
+      newPostData.category,
       newPostData.privacy,
     ];
     const queryResponse = await client.query(queryText, queryValues);
