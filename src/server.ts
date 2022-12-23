@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import {
   addNewPost,
+  deletePostById,
   getAllArtPosts,
   getAllPosts,
   getAllSciencePosts,
@@ -15,7 +16,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 dotenv.config();
-const PORT_NUMBER = process.env.PORT ?? 4001;
+const PORT_NUMBER = process.env.PORT ?? 5002;
 
 //============GET============
 
@@ -73,6 +74,21 @@ app.post<{}, {}, INewPostData>("/write", async (req, res) => {
       const createdPost = await addNewPost(req.body, req.headers.authorization);
       if (createdPost) {
         res.json(createdPost);
+      } else {
+        res.status(400);
+      }
+    }
+  }
+});
+
+//============DELETE============
+app.delete<{}, { postid: string }>("/profile/posts", async (req, res) => {
+  const postid = Number(req.query.postid);
+  {
+    if (postid) {
+      const deletedPost = await deletePostById(postid);
+      if (deletedPost) {
+        res.json(deletedPost);
       } else {
         res.status(400);
       }
