@@ -1,14 +1,21 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { addNewPost, getAllPosts, INewPostData } from "./db";
+import {
+  addNewPost,
+  getAllArtPosts,
+  getAllPosts,
+  getAllSciencePosts,
+  getAllThoughtPosts,
+  INewPostData,
+} from "./db";
 import filePath from "./filePath";
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 dotenv.config();
-const PORT_NUMBER = process.env.PORT ?? 4000;
+const PORT_NUMBER = process.env.PORT ?? 4001;
 
 //============GET============
 
@@ -20,17 +27,38 @@ app.get("/", (req, res) => {
 
 app.get("/posts", async (req, res) => {
   const posts = await getAllPosts();
-  res.json(posts);
+  if (posts) {
+    res.json(posts);
+  } else {
+    res.status(400);
+  }
 });
 
-app.get("/thought", (req, res) => {
-  const pathToFile = filePath("../public/index.html");
-  res.sendFile(pathToFile);
+app.get("/thought", async (req, res) => {
+  const posts = await getAllThoughtPosts();
+  if (posts) {
+    res.json(posts);
+  } else {
+    res.status(400);
+  }
 });
 
-app.get("/science", (req, res) => {
-  const pathToFile = filePath("../public/index.html");
-  res.sendFile(pathToFile);
+app.get("/science", async (req, res) => {
+  const posts = await getAllSciencePosts();
+  if (posts) {
+    res.json(posts);
+  } else {
+    res.status(400);
+  }
+});
+
+app.get("/art", async (req, res) => {
+  const posts = await getAllArtPosts();
+  if (posts) {
+    res.json(posts);
+  } else {
+    res.status(400);
+  }
 });
 
 app.get("/art", (req, res) => {

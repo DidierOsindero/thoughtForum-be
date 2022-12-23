@@ -104,12 +104,34 @@ export const getAllPosts = async () => {
 
 export const getAllThoughtPosts = async () => {
   try {
-    const queryText = "SELECT * FROM WHERE category = 'thought' user_posts";
+    const queryText = "SELECT * FROM user_posts WHERE category = 'thought' ";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
   } catch (error) {
-    console.error("There was an error getting all posts: ", error);
+    console.error("There was an error getting thought posts: ", error);
+  }
+};
+
+export const getAllSciencePosts = async () => {
+  try {
+    const queryText = "SELECT * FROM user_posts WHERE category = 'science' ";
+    const queryResponse = await client.query(queryText);
+    const posts = queryResponse.rows;
+    return posts;
+  } catch (error) {
+    console.error("There was an error getting science posts: ", error);
+  }
+};
+
+export const getAllArtPosts = async () => {
+  try {
+    const queryText = "SELECT * FROM user_posts WHERE category = 'art' ";
+    const queryResponse = await client.query(queryText);
+    const posts = queryResponse.rows;
+    return posts;
+  } catch (error) {
+    console.error("There was an error getting science posts: ", error);
   }
 };
 
