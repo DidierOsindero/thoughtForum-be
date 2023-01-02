@@ -11,6 +11,7 @@ import {
   INewPostData,
 } from "./db";
 import filePath from "./filePath";
+import { isolateToken } from "./isAuthorised";
 
 const app = express();
 app.use(express.json());
@@ -70,8 +71,9 @@ app.get("/art", (req, res) => {
 //============POST============
 app.post<{}, {}, INewPostData>("/write", async (req, res) => {
   {
-    if (req.headers.authorization) {
-      const createdPost = await addNewPost(req.body, req.headers.authorization);
+    const token = req.headers.authorization;
+    if (token) {
+      const createdPost = await addNewPost(req.body, isolateToken(token));
       if (createdPost) {
         res.json(createdPost);
       } else {

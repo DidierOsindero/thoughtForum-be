@@ -29,6 +29,7 @@ export interface INewPostData {
 }
 
 export const getAllPosts = async () => {
+  console.log("REQUESTING ALL POSTS");
   try {
     const queryText = "SELECT * FROM user_posts";
     const queryResponse = await client.query(queryText);
@@ -74,7 +75,7 @@ export const getAllArtPosts = async () => {
 
 export const deletePostById = async (postId: number) => {
   try {
-    const queryText = "DELETE FROM user_posts WHERE post_id = $1 RETURNING * ";
+    const queryText = "DELETE FROM user_posts WHERE post_id = $1 RETURNING *";
     const queryValues = [postId];
     const queryResponse = await client.query(queryText, queryValues);
     const posts = queryResponse.rows[0];
