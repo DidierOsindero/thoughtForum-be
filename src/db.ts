@@ -84,10 +84,34 @@ export const deletePostById = async (postId: number) => {
   }
 };
 
+// export const addNewPost = async (newPostData: INewPostData, userId: string) => {
+//   try {
+//     const queryText =
+//       "INSERT INTO user_posts (user_id, title, content, img, category, privacy) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *";
+//     const queryValues = [
+//       userId,
+//       newPostData.title,
+//       newPostData.content,
+//       newPostData.img,
+//       newPostData.category,
+//       newPostData.privacy,
+//     ];
+//     const queryResponse = await client.query(queryText, queryValues);
+//     const createdPost = queryResponse.rows[0];
+
+//     return createdPost;
+//   } catch (error) {
+//     console.error(
+//       "There was an error when adding a new post to the database: ",
+//       error
+//     );
+//   }
+// };
+
 export const addNewPost = async (newPostData: INewPostData, userId: string) => {
   try {
     const queryText =
-      "INSERT INTO user_posts (user_id, title, content, img, category, privacy) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *";
+      "BEGIN; INSERT INTO users (user_id) VALUES ($1); INSERT INTO user_posts (user_id, title, content, img, category, privacy) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *; COMMIT;";
     const queryValues = [
       userId,
       newPostData.title,
@@ -102,7 +126,7 @@ export const addNewPost = async (newPostData: INewPostData, userId: string) => {
     return createdPost;
   } catch (error) {
     console.error(
-      "There was an error when adding a new post to the database: ",
+      "There was an error when adding a new post to the database:",
       error
     );
   }
