@@ -112,7 +112,7 @@ export const deletePostById = async (postId: number) => {
 export const addNewPost = async (newPostData: INewPostData, userId: string) => {
   try {
     const queryText =
-      "BEGIN; INSERT INTO users (user_id) VALUES ($1) ON CONFLICT DO NOTHING;; INSERT INTO user_posts (user_id, title, content, img, category, privacy) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *; COMMIT;";
+      "BEGIN; INSERT INTO users (user_id) VALUES ($1) ON CONFLICT DO NOTHING; INSERT INTO user_posts (user_id, title, content, img, category, privacy) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *; COMMIT;";
     const queryValues = [
       userId,
       newPostData.title,
