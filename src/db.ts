@@ -130,8 +130,10 @@ export const addNewUser = async (userId: string) => {
 
 export const addNewPost = async (newPostData: INewPostData, userId: string) => {
   try {
+    client.query("BEGIN;");
+    addNewUser(userId);
     const insertUserText =
-      "INSERT INTO user_posts (user_id, title, content, img, category, privacy) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *; COMMIT;";
+      "INSERT INTO user_posts (user_id, title, content, img, category, privacy) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;";
     const insertUserValues = [
       userId,
       newPostData.title,
@@ -144,6 +146,7 @@ export const addNewPost = async (newPostData: INewPostData, userId: string) => {
     client.query("COMMIT;");
     const createdPost = queryResponse.rows[0];
 
+    console.log(createdPost);
     return createdPost;
   } catch (error) {
     console.error(

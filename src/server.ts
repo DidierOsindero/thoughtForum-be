@@ -74,7 +74,6 @@ app.post<{}, {}, INewPostData>("/write", async (req, res) => {
   {
     const token = req.headers.authorization;
     if (token) {
-      const createdUser = await addNewUser(isolateToken(token));
       const createdPost = await addNewPost(req.body, isolateToken(token));
       if (createdPost) {
         res.json(createdPost);
