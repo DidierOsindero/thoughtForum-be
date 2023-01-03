@@ -109,11 +109,30 @@ export const deletePostById = async (postId: number) => {
 //   }
 // };
 
+export const addNewUser = async (userId: string) => {
+  try {
+    console.log(userId);
+    const addUserText = `INSERT INTO users (user_id) VALUES ($1) ON CONFLICT DO NOTHING RETURNING *;`;
+    const addUserValues = [userId];
+    const addUserValuesResponse = await client.query(
+      addUserText,
+      addUserValues
+    );
+    const createdUser = addUserValuesResponse.rows[0];
+    return createdUser;
+  } catch (error) {
+    console.error(
+      "There was an error when adding a new user to the database:",
+      error
+    );
+  }
+};
+
 export const addNewPost = async (newPostData: INewPostData, userId: string) => {
   try {
-    const queryText =
-      "BEGIN; INSERT INTO users (user_id) VALUES ($1) ON CONFLICT DO NOTHING; INSERT INTO user_posts (user_id, title, content, img, category, privacy) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *; COMMIT;";
-    const queryValues = [
+    const insertUserText =
+      "INSERT INTO user_posts (user_id, title, content, img, category, privacy) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *; COMMIT;";
+    const insertUserValues = [
       userId,
       newPostData.title,
       newPostData.content,
@@ -121,7 +140,8 @@ export const addNewPost = async (newPostData: INewPostData, userId: string) => {
       newPostData.category,
       newPostData.privacy,
     ];
-    const queryResponse = await client.query(queryText, queryValues);
+    const queryResponse = await client.query(insertUserText, insertUserValues);
+    client.query("COMMIT;");
     const createdPost = queryResponse.rows[0];
 
     return createdPost;

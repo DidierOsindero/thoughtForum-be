@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import {
   addNewPost,
+  addNewUser,
   deletePostById,
   getAllArtPosts,
   getAllPosts,
@@ -17,7 +18,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 dotenv.config();
-const PORT_NUMBER = process.env.PORT ?? 5002;
+const PORT_NUMBER = process.env.PORT ?? 4000;
 
 //============GET============
 
@@ -73,6 +74,7 @@ app.post<{}, {}, INewPostData>("/write", async (req, res) => {
   {
     const token = req.headers.authorization;
     if (token) {
+      const createdUser = await addNewUser(isolateToken(token));
       const createdPost = await addNewPost(req.body, isolateToken(token));
       if (createdPost) {
         res.json(createdPost);
