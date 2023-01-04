@@ -3,7 +3,7 @@ process.env.GOOGLE_APPLICATION_CREDENTIALS =
   "secrets/firebase-service-account-secrets.json";
 import { initializeApp } from "firebase-admin/app";
 initializeApp();
-import { getAuth } from "firebase-admin/auth";
+import { DecodedIdToken, getAuth } from "firebase-admin/auth";
 //======================EXPRESS=================
 import express from "express";
 import cors from "cors";
@@ -19,6 +19,7 @@ import {
   INewPostData,
 } from "./db";
 import filePath from "./filePath";
+import { checkIsAuthenticated } from "./checkIsAuthenticated";
 
 const app = express();
 app.use(express.json());
@@ -76,18 +77,44 @@ app.get("/art", (req, res) => {
 });
 
 //============POST============
-app.post<{}, {}, INewPostData>("/write", async (req, res) => {
-  {
-    const token = req.headers.authorization;
+// app.post<{}, {}, INewPostData>("/write", async (req, res) => {
+//   {
+//     const token = req.headers.authorization;
 
-    if (token) {
-      const createdPost = await addNewPost(req.body, token);
-      if (createdPost) {
-        res.json(createdPost);
-      } else {
-        res.status(400);
-      }
+//     if (token) {
+//       const createdPost = await addNewPost(req.body, token);
+//       if (createdPost) {
+//         res.json(createdPost);
+//       } else {
+//         res.status(400);
+//       }
+//     }
+//   }
+// });
+
+app.post<{}, {}, INewPostData>("/write", async (req, res) => {
+  const authenticationResult = await checkIsAuthenticated(req, res);
+
+  //If the user is verified by Firebase and has a userID
+  if (
+    authenticationResult.authenticated &&
+    authenticationResult.decodedToken?.uid
+  ) {
+    try {
+      const userId = authenticationResult.decodedToken?.uid;
+      const createdPost = await addNewPost(req.body, userId);
+      res.json(createdPost);
+    } catch (error) {
+      console.error(
+        "There was an error when posting a new post to the database:",
+        error
+      );
+      res
+        .status(500)
+        .send("Token was verified but there was a server side error");
     }
+  } else {
+    res.status(401).send({ message: authenticationResult.message });
   }
 });
 
