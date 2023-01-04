@@ -1,3 +1,10 @@
+//======================FIREBASE=================
+process.env.GOOGLE_APPLICATION_CREDENTIALS =
+  "secrets/firebase-service-account-secrets.json";
+import { initializeApp } from "firebase-admin/app";
+initializeApp();
+import { getAuth } from "firebase-admin/auth";
+//======================EXPRESS=================
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -12,7 +19,6 @@ import {
   INewPostData,
 } from "./db";
 import filePath from "./filePath";
-import { isolateToken } from "./isAuthorised";
 
 const app = express();
 app.use(express.json());
@@ -73,8 +79,9 @@ app.get("/art", (req, res) => {
 app.post<{}, {}, INewPostData>("/write", async (req, res) => {
   {
     const token = req.headers.authorization;
+
     if (token) {
-      const createdPost = await addNewPost(req.body, isolateToken(token));
+      const createdPost = await addNewPost(req.body, token);
       if (createdPost) {
         res.json(createdPost);
       } else {
