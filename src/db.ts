@@ -28,6 +28,7 @@ export interface INewPostData {
   privacy: PostPrivacy | null;
 }
 
+//===========================GET==============================
 export const getAllPosts = async () => {
   console.log("REQUESTING ALL POSTS");
   try {
@@ -72,7 +73,7 @@ export const getAllArtPosts = async () => {
     console.error("There was an error getting art posts: ", error);
   }
 };
-
+//===========================DELETE==============================
 export const deletePostById = async (postId: number) => {
   try {
     const queryText = "DELETE FROM user_posts WHERE post_id = $1 RETURNING *";
@@ -85,30 +86,7 @@ export const deletePostById = async (postId: number) => {
   }
 };
 
-// export const addNewPost = async (newPostData: INewPostData, userId: string) => {
-//   try {
-//     const queryText =
-//       "INSERT INTO user_posts (user_id, title, content, img, category, privacy) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *";
-//     const queryValues = [
-//       userId,
-//       newPostData.title,
-//       newPostData.content,
-//       newPostData.img,
-//       newPostData.category,
-//       newPostData.privacy,
-//     ];
-//     const queryResponse = await client.query(queryText, queryValues);
-//     const createdPost = queryResponse.rows[0];
-
-//     return createdPost;
-//   } catch (error) {
-//     console.error(
-//       "There was an error when adding a new post to the database: ",
-//       error
-//     );
-//   }
-// };
-
+//===========================POST==============================
 export const addNewUser = async (userId: string) => {
   try {
     console.log(userId);
