@@ -8,7 +8,7 @@ export async function checkIsAuthenticated(
   res: Express.Response
 ) {
   const potentialToken = req.headers.authorization;
-  console.log("My Token with Bearer:", potentialToken);
+
   if (!potentialToken) {
     return { authenticated: false, message: "No token!" };
   }
