@@ -16,6 +16,7 @@ import {
   getAllPosts,
   getAllSciencePosts,
   getAllThoughtPosts,
+  getAllUserPosts,
   INewPostData,
 } from "./db";
 import filePath from "./filePath";
@@ -71,9 +72,27 @@ app.get("/art", async (req, res) => {
   }
 });
 
-app.get("/art", (req, res) => {
-  const pathToFile = filePath("../public/index.html");
-  res.sendFile(pathToFile);
+app.get("/profile/posts", async (req, res) => {
+  const authenticationResult = await checkIsAuthenticated(req, res);
+
+  //If the user is verified by Firebase and has a userID
+  if (
+    authenticationResult.authenticated &&
+    authenticationResult.decodedToken?.uid
+  ) {
+    try {
+      const userId = authenticationResult.decodedToken?.uid;
+      const userPosts = await getAllUserPosts(userId);
+      res.json(userPosts);
+    } catch (error) {
+      console.error("There was an error when getting all user posts:", error);
+      res
+        .status(500)
+        .send("Token was verified but there was a server side error");
+    }
+  } else {
+    res.status(401).send({ message: authenticationResult.message });
+  }
 });
 
 //============POST============

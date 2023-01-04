@@ -30,9 +30,8 @@ export interface INewPostData {
 
 //===========================GET==============================
 export const getAllPosts = async () => {
-  console.log("REQUESTING ALL POSTS");
   try {
-    const queryText = "SELECT * FROM user_posts";
+    const queryText = "SELECT * FROM user_posts WHERE privacy = 'public'";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -43,7 +42,8 @@ export const getAllPosts = async () => {
 
 export const getAllThoughtPosts = async () => {
   try {
-    const queryText = "SELECT * FROM user_posts WHERE category = 'thought' ";
+    const queryText =
+      "SELECT * FROM user_posts WHERE category = 'thought' AND privacy = 'public'";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -54,7 +54,8 @@ export const getAllThoughtPosts = async () => {
 
 export const getAllSciencePosts = async () => {
   try {
-    const queryText = "SELECT * FROM user_posts WHERE category = 'science' ";
+    const queryText =
+      "SELECT * FROM user_posts WHERE category = 'science' AND privacy = 'public'";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -65,12 +66,25 @@ export const getAllSciencePosts = async () => {
 
 export const getAllArtPosts = async () => {
   try {
-    const queryText = "SELECT * FROM user_posts WHERE category = 'art' ";
+    const queryText =
+      "SELECT * FROM user_posts WHERE category = 'art' AND privacy = 'public'";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
   } catch (error) {
     console.error("There was an error getting art posts: ", error);
+  }
+};
+
+export const getAllUserPosts = async (userId: string) => {
+  try {
+    const queryText = "SELECT * FROM user_posts WHERE user_id = $1";
+    const queryValues = [userId];
+    const queryResponse = await client.query(queryText, queryValues);
+    const userPosts = queryResponse.rows;
+    return userPosts;
+  } catch (error) {
+    console.error("There was an error getting user posts: ", error);
   }
 };
 //===========================DELETE==============================
