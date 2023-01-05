@@ -45,7 +45,7 @@ app.get("/posts", async (req, res) => {
   }
 });
 
-app.get("/thought", async (req, res) => {
+app.get("/posts/thought", async (req, res) => {
   const posts = await getAllThoughtPosts();
   if (posts) {
     res.json(posts);
@@ -54,7 +54,7 @@ app.get("/thought", async (req, res) => {
   }
 });
 
-app.get("/science", async (req, res) => {
+app.get("/posts/science", async (req, res) => {
   const posts = await getAllSciencePosts();
   if (posts) {
     res.json(posts);
@@ -63,7 +63,7 @@ app.get("/science", async (req, res) => {
   }
 });
 
-app.get("/art", async (req, res) => {
+app.get("/posts/art", async (req, res) => {
   const posts = await getAllArtPosts();
   if (posts) {
     res.json(posts);
