@@ -31,7 +31,8 @@ export interface INewPostData {
 //===========================GET==============================
 export const getAllPosts = async () => {
   try {
-    const queryText = "SELECT * FROM user_posts WHERE privacy = 'public'";
+    const queryText =
+      "SELECT * FROM user_posts WHERE privacy = 'public' ORDER BY creation_date DESC";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -43,7 +44,7 @@ export const getAllPosts = async () => {
 export const getAllThoughtPosts = async () => {
   try {
     const queryText =
-      "SELECT * FROM user_posts WHERE category = 'thought' AND privacy = 'public'";
+      "SELECT * FROM user_posts WHERE category = 'thought' AND privacy = 'public' ORDER BY creation_date DESC";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -55,7 +56,7 @@ export const getAllThoughtPosts = async () => {
 export const getAllSciencePosts = async () => {
   try {
     const queryText =
-      "SELECT * FROM user_posts WHERE category = 'science' AND privacy = 'public'";
+      "SELECT * FROM user_posts WHERE category = 'science' AND privacy = 'public' ORDER BY creation_date DESC";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -67,7 +68,7 @@ export const getAllSciencePosts = async () => {
 export const getAllArtPosts = async () => {
   try {
     const queryText =
-      "SELECT * FROM user_posts WHERE category = 'art' AND privacy = 'public'";
+      "SELECT * FROM user_posts WHERE category = 'art' AND privacy = 'public' ORDER BY creation_date DESC";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -78,7 +79,8 @@ export const getAllArtPosts = async () => {
 
 export const getAllUserPosts = async (userId: string) => {
   try {
-    const queryText = "SELECT * FROM user_posts WHERE user_id = $1";
+    const queryText =
+      "SELECT * FROM user_posts WHERE user_id = $1 ORDER BY creation_date DESC";
     const queryValues = [userId];
     const queryResponse = await client.query(queryText, queryValues);
     const userPosts = queryResponse.rows;

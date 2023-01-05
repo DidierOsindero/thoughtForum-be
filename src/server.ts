@@ -96,20 +96,6 @@ app.get("/profile/posts", async (req, res) => {
 });
 
 //============POST============
-// app.post<{}, {}, INewPostData>("/write", async (req, res) => {
-//   {
-//     const token = req.headers.authorization;
-
-//     if (token) {
-//       const createdPost = await addNewPost(req.body, token);
-//       if (createdPost) {
-//         res.json(createdPost);
-//       } else {
-//         res.status(400);
-//       }
-//     }
-//   }
-// });
 
 app.post<{}, {}, INewPostData>("/write", async (req, res) => {
   const authenticationResult = await checkIsAuthenticated(req, res);
@@ -138,19 +124,22 @@ app.post<{}, {}, INewPostData>("/write", async (req, res) => {
 });
 
 //============DELETE============
-app.delete<{}, { postid: string }>("/profile/posts", async (req, res) => {
-  const postid = Number(req.query.postid);
-  {
-    if (postid) {
-      const deletedPost = await deletePostById(postid);
-      if (deletedPost) {
-        res.json(deletedPost);
-      } else {
-        res.status(400);
+app.delete<{}, {}, {}, { postid: string }>(
+  "/profile/posts",
+  async (req, res) => {
+    const postid = Number(req.query.postid);
+    {
+      if (postid) {
+        const deletedPost = await deletePostById(postid);
+        if (deletedPost) {
+          res.json(deletedPost);
+        } else {
+          res.status(400);
+        }
       }
     }
   }
-});
+);
 
 app.listen(PORT_NUMBER, () => {
   console.log(`Server is listening on port ${PORT_NUMBER}!`);

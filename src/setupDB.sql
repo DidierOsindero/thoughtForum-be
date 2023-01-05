@@ -14,6 +14,5 @@ CREATE TABLE user_posts(
 DROP TABLE IF EXISTS users;
 CREATE TABLE users(
   user_id varchar primary key,
-  first_name varchar(20),
-  last_name varchar(20)
+  username varchar(20)
   );
