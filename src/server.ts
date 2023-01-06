@@ -1,12 +1,18 @@
 //======================FIREBASE=================
 if (process.env.NODE_ENV === "production") {
+  //=====Default location for render.com secret files is /etc/secrets/<filename>====
   process.env.GOOGLE_APPLICATION_CREDENTIALS =
-    "../firebase-service-account-secrets.json";
+    "/etc/secrets/firebase-service-account-secrets.json";
 } else {
   process.env.GOOGLE_APPLICATION_CREDENTIALS =
     "secrets/firebase-service-account-secrets.json";
 }
 import { initializeApp } from "firebase-admin/app";
+//=========This will only ever contain filename, not actual credentials========
+console.log(
+  "process.env.GOOGLE_APPLICATION_CREDENTIALS:",
+  process.env.GOOGLE_APPLICATION_CREDENTIALS
+);
 initializeApp();
 //======================EXPRESS=================
 import express from "express";
