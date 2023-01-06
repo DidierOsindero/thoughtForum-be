@@ -3,14 +3,12 @@ process.env.GOOGLE_APPLICATION_CREDENTIALS =
   "secrets/firebase-service-account-secrets.json";
 import { initializeApp } from "firebase-admin/app";
 initializeApp();
-import { DecodedIdToken, getAuth } from "firebase-admin/auth";
 //======================EXPRESS=================
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import {
   addNewPost,
-  addNewUser,
   deletePostById,
   getAllArtPosts,
   getAllPosts,
@@ -75,7 +73,7 @@ app.get("/posts/art", async (req, res) => {
 app.get("/profile/posts", async (req, res) => {
   const authenticationResult = await checkIsAuthenticated(req, res);
 
-  //If the user is verified by Firebase and has a userID
+  //================Check if the user is verified by Firebase and has a userID================
   if (
     authenticationResult.authenticated &&
     authenticationResult.decodedToken?.uid
@@ -100,7 +98,7 @@ app.get("/profile/posts", async (req, res) => {
 app.post<{}, {}, INewPostData>("/write", async (req, res) => {
   const authenticationResult = await checkIsAuthenticated(req, res);
 
-  //If the user is verified by Firebase and has a userID
+  //================Check if the user is verified by Firebase and has a userID================
   if (
     authenticationResult.authenticated &&
     authenticationResult.decodedToken?.uid
