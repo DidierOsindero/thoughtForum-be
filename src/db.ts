@@ -28,9 +28,11 @@ export interface INewPostData {
   privacy: PostPrivacy | null;
 }
 
+//===========================GET==============================
 export const getAllPosts = async () => {
   try {
-    const queryText = "SELECT * FROM user_posts";
+    const queryText =
+      "SELECT * FROM user_posts WHERE privacy = 'public' ORDER BY creation_date DESC";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -41,7 +43,8 @@ export const getAllPosts = async () => {
 
 export const getAllThoughtPosts = async () => {
   try {
-    const queryText = "SELECT * FROM user_posts WHERE category = 'thought' ";
+    const queryText =
+      "SELECT * FROM user_posts WHERE category = 'thought' AND privacy = 'public' ORDER BY creation_date DESC";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -52,7 +55,8 @@ export const getAllThoughtPosts = async () => {
 
 export const getAllSciencePosts = async () => {
   try {
-    const queryText = "SELECT * FROM user_posts WHERE category = 'science' ";
+    const queryText =
+      "SELECT * FROM user_posts WHERE category = 'science' AND privacy = 'public' ORDER BY creation_date DESC";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -63,7 +67,8 @@ export const getAllSciencePosts = async () => {
 
 export const getAllArtPosts = async () => {
   try {
-    const queryText = "SELECT * FROM user_posts WHERE category = 'art' ";
+    const queryText =
+      "SELECT * FROM user_posts WHERE category = 'art' AND privacy = 'public' ORDER BY creation_date DESC";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -72,9 +77,22 @@ export const getAllArtPosts = async () => {
   }
 };
 
+export const getAllUserPosts = async (userId: string) => {
+  try {
+    const queryText =
+      "SELECT * FROM user_posts WHERE user_id = $1 ORDER BY creation_date DESC";
+    const queryValues = [userId];
+    const queryResponse = await client.query(queryText, queryValues);
+    const userPosts = queryResponse.rows;
+    return userPosts;
+  } catch (error) {
+    console.error("There was an error getting user posts: ", error);
+  }
+};
+//===========================DELETE==============================
 export const deletePostById = async (postId: number) => {
   try {
-    const queryText = "DELETE FROM user_posts WHERE post_id = $1 RETURNING * ";
+    const queryText = "DELETE FROM user_posts WHERE post_id = $1 RETURNING *";
     const queryValues = [postId];
     const queryResponse = await client.query(queryText, queryValues);
     const posts = queryResponse.rows[0];
@@ -84,11 +102,33 @@ export const deletePostById = async (postId: number) => {
   }
 };
 
+//===========================POST==============================
+export const addNewUser = async (userId: string) => {
+  try {
+    console.log(userId);
+    const addUserText = `INSERT INTO users (user_id) VALUES ($1) ON CONFLICT DO NOTHING RETURNING *;`;
+    const addUserValues = [userId];
+    const addUserValuesResponse = await client.query(
+      addUserText,
+      addUserValues
+    );
+    const createdUser = addUserValuesResponse.rows[0];
+    return createdUser;
+  } catch (error) {
+    console.error(
+      "There was an error when adding a new user to the database:",
+      error
+    );
+  }
+};
+
 export const addNewPost = async (newPostData: INewPostData, userId: string) => {
   try {
-    const queryText =
-      "INSERT INTO user_posts (user_id, title, content, img, category, privacy) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *";
-    const queryValues = [
+    client.query("BEGIN;");
+    addNewUser(userId);
+    const insertUserText =
+      "INSERT INTO user_posts (user_id, title, content, img, category, privacy) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;";
+    const insertUserValues = [
       userId,
       newPostData.title,
       newPostData.content,
@@ -96,13 +136,15 @@ export const addNewPost = async (newPostData: INewPostData, userId: string) => {
       newPostData.category,
       newPostData.privacy,
     ];
-    const queryResponse = await client.query(queryText, queryValues);
+    const queryResponse = await client.query(insertUserText, insertUserValues);
+    client.query("COMMIT;");
     const createdPost = queryResponse.rows[0];
 
+    console.log(createdPost);
     return createdPost;
   } catch (error) {
     console.error(
-      "There was an error when adding a new post to the database: ",
+      "There was an error when adding a new post to the database:",
       error
     );
   }
