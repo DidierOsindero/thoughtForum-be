@@ -21,6 +21,7 @@ export type PostType = "thought" | "science" | "art";
 export type PostPrivacy = "public" | "private";
 
 export interface INewPostData {
+  username: string | null;
   img: string | null;
   title: string;
   content: string;
@@ -31,8 +32,7 @@ export interface INewPostData {
 //===========================GET==============================
 export const getAllPosts = async () => {
   try {
-    const queryText =
-      "SELECT * FROM user_posts WHERE privacy = 'public' ORDER BY creation_date DESC";
+    const queryText = "SELECT * FROM get_posts_with_username;";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -44,7 +44,7 @@ export const getAllPosts = async () => {
 export const getAllThoughtPosts = async () => {
   try {
     const queryText =
-      "SELECT * FROM user_posts WHERE category = 'thought' AND privacy = 'public' ORDER BY creation_date DESC";
+      "SELECT * FROM get_posts_with_username WHERE category = 'thought';";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -56,7 +56,7 @@ export const getAllThoughtPosts = async () => {
 export const getAllSciencePosts = async () => {
   try {
     const queryText =
-      "SELECT * FROM user_posts WHERE category = 'science' AND privacy = 'public' ORDER BY creation_date DESC";
+      "SELECT * FROM get_posts_with_username WHERE category = 'science';";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -68,7 +68,7 @@ export const getAllSciencePosts = async () => {
 export const getAllArtPosts = async () => {
   try {
     const queryText =
-      "SELECT * FROM user_posts WHERE category = 'art' AND privacy = 'public' ORDER BY creation_date DESC";
+      "SELECT * FROM get_posts_with_username WHERE category = 'art';";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -122,10 +122,39 @@ export const addNewUser = async (userId: string) => {
   }
 };
 
+export const addNewUserWithUsername = async (
+  userId: string,
+  username: string
+) => {
+  try {
+    console.log(userId);
+    const addUserText = `INSERT INTO users (user_id, username) VALUES ($1, $2) ON CONFLICT DO NOTHING RETURNING *;`;
+    const addUserValues = [userId, username];
+    const addUserValuesResponse = await client.query(
+      addUserText,
+      addUserValues
+    );
+    const createdUser = addUserValuesResponse.rows[0];
+    return createdUser;
+  } catch (error) {
+    console.error(
+      "There was an error when adding a new user with username to the database:",
+      error
+    );
+  }
+};
+
 export const addNewPost = async (newPostData: INewPostData, userId: string) => {
   try {
     client.query("BEGIN;");
-    addNewUser(userId);
+
+    //===========Check if user has a username or not and add to DB accordingly===============
+    if (newPostData.username) {
+      addNewUserWithUsername(userId, newPostData.username);
+    } else {
+      addNewUser(userId);
+    }
+
     const insertUserText =
       "INSERT INTO user_posts (user_id, title, content, img, category, privacy) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;";
     const insertUserValues = [
