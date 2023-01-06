@@ -1,6 +1,11 @@
 //======================FIREBASE=================
-process.env.GOOGLE_APPLICATION_CREDENTIALS =
-  "secrets/firebase-service-account-secrets.json";
+if (process.env.NODE_ENV === "production") {
+  process.env.GOOGLE_APPLICATION_CREDENTIALS =
+    "../firebase-service-account-secrets.json";
+} else {
+  process.env.GOOGLE_APPLICATION_CREDENTIALS =
+    "secrets/firebase-service-account-secrets.json";
+}
 import { initializeApp } from "firebase-admin/app";
 initializeApp();
 //======================EXPRESS=================
