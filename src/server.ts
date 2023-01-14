@@ -26,6 +26,7 @@ import {
   getAllSciencePosts,
   getAllThoughtPosts,
   getAllUserPosts,
+  getPostById,
   INewPostData,
 } from "./db";
 import filePath from "./filePath";
@@ -35,7 +36,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 dotenv.config();
-const PORT_NUMBER = process.env.PORT ?? 4000;
+const PORT_NUMBER = process.env.PORT ?? 4001;
 
 //============GET============
 
@@ -69,6 +70,19 @@ app.get("/posts/science", async (req, res) => {
     res.json(posts);
   } else {
     res.status(400);
+  }
+});
+
+app.get<{ id: string }>("/posts/:id", async (req, res) => {
+  const post = await getPostById(req.params.id);
+  if (post) {
+    res.json(post);
+  } else if (post === undefined) {
+    console.log("Bad request to get post by id, post does not exist.");
+    res.status(400).send("Bad request to get post by id, post does not exist.");
+  } else if (post === null) {
+    console.log("Server error when getting post by id.");
+    res.status(400).send("Server error when getting post by id.");
   }
 });
 
