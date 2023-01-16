@@ -73,6 +73,15 @@ app.get("/posts/science", async (req, res) => {
   }
 });
 
+app.get("/posts/art", async (req, res) => {
+  const posts = await getAllArtPosts();
+  if (posts) {
+    res.json(posts);
+  } else {
+    res.status(400);
+  }
+});
+//------------------------------------------------------------------------Get Posts by ID-----------
 app.get<{ id: string }>("/posts/:id", async (req, res) => {
   const post = await getPostById(req.params.id);
   if (post) {
@@ -83,15 +92,6 @@ app.get<{ id: string }>("/posts/:id", async (req, res) => {
   } else if (post === null) {
     console.log("Server error when getting post by id.");
     res.status(400).send("Server error when getting post by id.");
-  }
-});
-
-app.get("/posts/art", async (req, res) => {
-  const posts = await getAllArtPosts();
-  if (posts) {
-    res.json(posts);
-  } else {
-    res.status(400);
   }
 });
 
