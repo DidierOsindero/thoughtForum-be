@@ -36,7 +36,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 dotenv.config();
-const PORT_NUMBER = process.env.PORT ?? 4001;
+const PORT_NUMBER = process.env.PORT ?? 4000;
 
 //============GET============
 
