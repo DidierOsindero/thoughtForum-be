@@ -27,6 +27,7 @@ import {
   getAllThoughtPosts,
   getAllUserPosts,
   getPostById,
+  getRecommendedPosts,
   INewPostData,
 } from "./db";
 import filePath from "./filePath";
@@ -81,7 +82,19 @@ app.get("/posts/art", async (req, res) => {
     res.status(400);
   }
 });
-//------------------------------------------------------------------------Get Posts by ID-----------
+//--------------------------------------------------------------------Get Recommended Posts by Category
+app.get<{ category: string }>(
+  "/posts/recommend/:category",
+  async (req, res) => {
+    const posts = await getRecommendedPosts(req.params.category);
+    if (posts) {
+      res.json(posts);
+    } else {
+      res.status(400);
+    }
+  }
+);
+//------------------------------------------------------------------------Get Posts by ID
 app.get<{ id: string }>("/posts/:id", async (req, res) => {
   const post = await getPostById(req.params.id);
   if (post) {
@@ -98,7 +111,7 @@ app.get<{ id: string }>("/posts/:id", async (req, res) => {
 app.get("/profile/posts", async (req, res) => {
   const authenticationResult = await checkIsAuthenticated(req, res);
 
-  //================Check if the user is verified by Firebase and has a userID================
+  //Check if the user is verified by Firebase and has a userID
   if (
     authenticationResult.authenticated &&
     authenticationResult.decodedToken?.uid
