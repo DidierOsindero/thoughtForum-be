@@ -14,8 +14,10 @@ export async function checkIsAuthenticated(
   }
 
   try {
+    console.log("Starting to authenticate");
     const idToken = potentialToken.replace(/Bearer /, "").trim();
     const decodedToken = await getAuth().verifyIdToken(idToken);
+    console.log("Finishing authenticating");
     return {
       authenticated: true,
       message: "Token was successfully verified",

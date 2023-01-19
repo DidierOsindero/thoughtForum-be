@@ -48,6 +48,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/posts", async (req, res) => {
+  console.log("GET all posts");
   const posts = await getAllPosts();
   if (posts) {
     res.json(posts);
@@ -110,6 +111,7 @@ app.get<{ id: string }>("/posts/:id", async (req, res) => {
 
 app.get("/profile/posts", async (req, res) => {
   const authenticationResult = await checkIsAuthenticated(req, res);
+  console.log("/profile/posts AUTH", authenticationResult);
 
   //Check if the user is verified by Firebase and has a userID
   if (
@@ -134,6 +136,7 @@ app.get("/profile/posts", async (req, res) => {
 //============POST============
 
 app.post<{}, {}, INewPostData>("/write", async (req, res) => {
+  console.log("Post to /write", new Date());
   const authenticationResult = await checkIsAuthenticated(req, res);
 
   //================Check if the user is verified by Firebase and has a userID================
