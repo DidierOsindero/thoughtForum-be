@@ -90,11 +90,11 @@ export const getAllUserPosts = async (userId: string) => {
   }
 };
 
-export const getRecommendedPosts = async (category: string) => {
+export const getRecommendedPosts = async (category: string, postId: string) => {
   try {
     const queryText =
-      "SELECT * FROM user_posts WHERE category = $1 ORDER BY hearts DESC LIMIT 10";
-    const queryValues = [category];
+      "SELECT * FROM user_posts WHERE category = $1 AND post_id != $2 ORDER BY hearts DESC LIMIT 10";
+    const queryValues = [category, postId];
     const queryResponse = await client.query(queryText, queryValues);
     const userPosts = queryResponse.rows;
     if (userPosts.length > 0) {

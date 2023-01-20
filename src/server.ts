@@ -48,55 +48,70 @@ app.get("/", (req, res) => {
 });
 
 app.get("/posts", async (req, res) => {
-  console.log("GET all posts");
+  console.log("GET all posts", new Date());
   const posts = await getAllPosts();
   if (posts) {
     res.json(posts);
   } else {
     res.status(400);
   }
+  console.log("FINISH get all posts", new Date());
 });
 
 app.get("/posts/thought", async (req, res) => {
+  console.log("get /posts/thought", new Date());
+
   const posts = await getAllThoughtPosts();
   if (posts) {
     res.json(posts);
   } else {
     res.status(400);
   }
+  console.log("FINISH get /posts/thought", new Date());
 });
 
 app.get("/posts/science", async (req, res) => {
+  console.log("get /posts/science", new Date());
+
   const posts = await getAllSciencePosts();
   if (posts) {
     res.json(posts);
   } else {
     res.status(400);
   }
+  console.log("FINISH get /posts/science", new Date());
 });
 
 app.get("/posts/art", async (req, res) => {
+  console.log("get /posts/art", new Date());
   const posts = await getAllArtPosts();
   if (posts) {
     res.json(posts);
   } else {
     res.status(400);
   }
+  console.log("FINISH get /posts/art", new Date());
 });
 //--------------------------------------------------------------------Get Recommended Posts by Category
-app.get<{ category: string }>(
-  "/posts/recommend/:category",
+app.get<{ category: string; postid: string }>(
+  "/posts/recommend/:category/:postid",
   async (req, res) => {
-    const posts = await getRecommendedPosts(req.params.category);
+    console.log("get /posts/recommend/:category", new Date());
+    const posts = await getRecommendedPosts(
+      req.params.category,
+      req.params.postid
+    );
     if (posts) {
       res.json(posts);
     } else {
       res.status(400);
     }
+    console.log("FINISH get /posts/recommend/:category", new Date());
   }
 );
 //------------------------------------------------------------------------Get Posts by ID
 app.get<{ id: string }>("/posts/:id", async (req, res) => {
+  console.log("get /posts/:id", new Date());
   const post = await getPostById(req.params.id);
   if (post) {
     res.json(post);
@@ -107,9 +122,11 @@ app.get<{ id: string }>("/posts/:id", async (req, res) => {
     console.log("Server error when getting post by id.");
     res.status(400).send("Server error when getting post by id.");
   }
+  console.log("FINISH get /posts/:id", new Date());
 });
 
 app.get("/profile/posts", async (req, res) => {
+  console.log("get /profile/posts", new Date());
   const authenticationResult = await checkIsAuthenticated(req, res);
   console.log("/profile/posts AUTH", authenticationResult);
 
@@ -131,6 +148,7 @@ app.get("/profile/posts", async (req, res) => {
   } else {
     res.status(401).send({ message: authenticationResult.message });
   }
+  console.log("FINISH get /profile/posts", new Date());
 });
 
 //============POST============
@@ -160,12 +178,14 @@ app.post<{}, {}, INewPostData>("/write", async (req, res) => {
   } else {
     res.status(401).send({ message: authenticationResult.message });
   }
+  console.log("FINISH Post to /write", new Date());
 });
 
 //============DELETE============
 app.delete<{}, {}, {}, { postid: string }>(
   "/profile/posts",
   async (req, res) => {
+    console.log("delete /profile/posts", new Date());
     const postid = Number(req.query.postid);
     {
       if (postid) {
@@ -177,6 +197,7 @@ app.delete<{}, {}, {}, { postid: string }>(
         }
       }
     }
+    console.log("FINISH delete /profile/posts", new Date());
   }
 );
 
