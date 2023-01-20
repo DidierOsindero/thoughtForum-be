@@ -89,6 +89,41 @@ export const getAllUserPosts = async (userId: string) => {
     console.error("There was an error getting user posts: ", error);
   }
 };
+
+export const getRecommendedPosts = async (category: string, postId: string) => {
+  try {
+    const queryText =
+      "SELECT * FROM user_posts WHERE category = $1 AND post_id != $2 ORDER BY hearts DESC LIMIT 10";
+    const queryValues = [category, postId];
+    const queryResponse = await client.query(queryText, queryValues);
+    const userPosts = queryResponse.rows;
+    if (userPosts.length > 0) {
+      return userPosts;
+    } else {
+      return undefined;
+    }
+  } catch (error) {
+    console.error("There was an error getting recommended posts: ", error);
+    return null;
+  }
+};
+
+export const getPostById = async (postId: string) => {
+  try {
+    const queryText = "SELECT * FROM user_posts WHERE post_id = $1";
+    const queryValues = [postId];
+    const queryResponse = await client.query(queryText, queryValues);
+    const userPosts = queryResponse.rows;
+    if (userPosts.length > 0) {
+      return userPosts;
+    } else {
+      return undefined;
+    }
+  } catch (error) {
+    console.error("There was an error getting post by ID: ", error);
+    return null;
+  }
+};
 //===========================DELETE==============================
 export const deletePostById = async (postId: number) => {
   try {
