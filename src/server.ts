@@ -30,7 +30,6 @@ import {
   getRecommendedPosts,
   INewPostData,
 } from "./db";
-import filePath from "./filePath";
 import { checkIsAuthenticated } from "./checkIsAuthenticated";
 
 const app = express();
@@ -40,12 +39,6 @@ dotenv.config();
 const PORT_NUMBER = process.env.PORT ?? 4000;
 
 //============GET============
-
-// API info page
-app.get("/", (req, res) => {
-  const pathToFile = filePath("../public/index.html");
-  res.sendFile(pathToFile);
-});
 
 app.get("/posts", async (req, res) => {
   console.log("GET all posts", new Date());
@@ -110,22 +103,8 @@ app.get<{ category: string; postid: string }>(
   }
 );
 //------------------------------------------------------------------------Get Posts by ID
-app.get<{ id: string }>("/posts/:id", async (req, res) => {
-  console.log("get /posts/:id", new Date());
-  const post = await getPostById(req.params.id);
-  if (post) {
-    res.json(post);
-  } else if (post === undefined) {
-    console.log("Bad request to get post by id, post does not exist.");
-    res.status(400).send("Bad request to get post by id, post does not exist.");
-  } else if (post === null) {
-    console.log("Server error when getting post by id.");
-    res.status(400).send("Server error when getting post by id.");
-  }
-  console.log("FINISH get /posts/:id", new Date());
-});
 
-app.get("/profile/posts", async (req, res) => {
+app.get("/posts/profile", async (req, res) => {
   console.log("get /profile/posts", new Date());
   const authenticationResult = await checkIsAuthenticated(req, res);
   console.log("/profile/posts AUTH", authenticationResult);
@@ -149,6 +128,21 @@ app.get("/profile/posts", async (req, res) => {
     res.status(401).send({ message: authenticationResult.message });
   }
   console.log("FINISH get /profile/posts", new Date());
+});
+
+app.get<{ id: string }>("/posts/:id", async (req, res) => {
+  console.log("get /posts/:id", new Date());
+  const post = await getPostById(req.params.id);
+  if (post) {
+    res.json(post);
+  } else if (post === undefined) {
+    console.log("Bad request to get post by id, post does not exist.");
+    res.status(400).send("Bad request to get post by id, post does not exist.");
+  } else if (post === null) {
+    console.log("Server error when getting post by id.");
+    res.status(400).send("Server error when getting post by id.");
+  }
+  console.log("FINISH get /posts/:id", new Date());
 });
 
 //============POST============
@@ -183,9 +177,9 @@ app.post<{}, {}, INewPostData>("/write", async (req, res) => {
 
 //============DELETE============
 app.delete<{}, {}, {}, { postid: string }>(
-  "/profile/posts",
+  "/posts/profile",
   async (req, res) => {
-    console.log("delete /profile/posts", new Date());
+    console.log("delete /posts/profile", new Date());
     const postid = Number(req.query.postid);
     {
       if (postid) {
