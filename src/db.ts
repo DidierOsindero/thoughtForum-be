@@ -98,11 +98,11 @@ export const getFeaturedPosts = async () => {
     if (userPosts.length > 0) {
       return userPosts;
     } else {
-      return undefined;
+      return "Bad request";
     }
   } catch (error) {
     console.error("There was an error getting featured posts: ", error);
-    return null;
+    return "Server error";
   }
 };
 
@@ -116,11 +116,11 @@ export const getRecommendedPosts = async (category: string, postId: string) => {
     if (userPosts.length > 0) {
       return userPosts;
     } else {
-      return undefined;
+      return "Bad request";
     }
   } catch (error) {
     console.error("There was an error getting recommended posts: ", error);
-    return null;
+    return "Server error";
   }
 };
 
@@ -133,11 +133,11 @@ export const getPostById = async (postId: string) => {
     if (userPosts.length > 0) {
       return userPosts;
     } else {
-      return undefined;
+      return "Bad request";
     }
   } catch (error) {
     console.error("There was an error getting post by ID: ", error);
-    return null;
+    return "Server error";
   }
 };
 //===========================DELETE==============================

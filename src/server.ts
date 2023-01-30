@@ -90,11 +90,16 @@ app.get("/posts/art", async (req, res) => {
 //--------------------------------------------------------------------Get Featured Posts
 app.get("/posts/feature", async (req, res) => {
   console.log("get /posts/feature/", new Date());
-  const posts = await getFeaturedPosts();
-  if (posts) {
-    res.json(posts);
-  } else {
-    res.status(400);
+  console.log("This is running");
+  const response = await getFeaturedPosts();
+  if (response !== "Bad request" && response !== "Server error") {
+    res.json(response);
+  } else if (response === "Bad request") {
+    console.log("Bad request to getting featured posts.");
+    res.status(400).send("Bad request to getting featured posts.");
+  } else if (response === "Server error") {
+    console.log("Server error when getting featured posts.");
+    res.status(400).send("Server error when getting featured posts.");
   }
   console.log("FINISH get /posts/feature/", new Date());
 });
@@ -103,20 +108,23 @@ app.get<{ category: string; postid: string }>(
   "/posts/recommend/:category/:postid",
   async (req, res) => {
     console.log("get /posts/recommend/:category", new Date());
-    const posts = await getRecommendedPosts(
+    const response = await getRecommendedPosts(
       req.params.category,
       req.params.postid
     );
-    if (posts) {
-      res.json(posts);
-    } else {
-      res.status(400);
+    if (response !== "Bad request" && response !== "Server error") {
+      res.json(response);
+    } else if (response === "Bad request") {
+      console.log("Bad request to getting recommended posts.");
+      res.status(400).send("Bad request to getting recommended posts.");
+    } else if (response === "Server error") {
+      console.log("Server error when getting recommended posts.");
+      res.status(400).send("Server error when getting recommended posts.");
     }
     console.log("FINISH get /posts/recommend/:category", new Date());
   }
 );
-//------------------------------------------------------------------------Get Posts by ID
-
+//--------------------------------------------------------------------Get Profile Posts
 app.get("/posts/profile", async (req, res) => {
   console.log("get /profile/posts", new Date());
   const authenticationResult = await checkIsAuthenticated(req, res);
@@ -142,16 +150,16 @@ app.get("/posts/profile", async (req, res) => {
   }
   console.log("FINISH get /profile/posts", new Date());
 });
-
+//------------------------------------------------------------------------Get Posts by ID
 app.get<{ id: string }>("/posts/:id", async (req, res) => {
   console.log("get /posts/:id", new Date());
-  const post = await getPostById(req.params.id);
-  if (post) {
-    res.json(post);
-  } else if (post === undefined) {
+  const response = await getPostById(req.params.id);
+  if (response !== "Bad request" && response !== "Server error") {
+    res.json(response);
+  } else if (response === "Bad request") {
     console.log("Bad request to get post by id, post does not exist.");
     res.status(400).send("Bad request to get post by id, post does not exist.");
-  } else if (post === null) {
+  } else if (response === "Server error") {
     console.log("Server error when getting post by id.");
     res.status(400).send("Server error when getting post by id.");
   }
