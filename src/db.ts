@@ -90,6 +90,22 @@ export const getAllUserPosts = async (userId: string) => {
   }
 };
 
+export const getFeaturedPosts = async () => {
+  try {
+    const queryText = "SELECT * FROM user_posts ORDER BY hearts DESC LIMIT 2";
+    const queryResponse = await client.query(queryText);
+    const userPosts = queryResponse.rows;
+    if (userPosts.length > 0) {
+      return userPosts;
+    } else {
+      return "Bad request";
+    }
+  } catch (error) {
+    console.error("There was an error getting featured posts: ", error);
+    return "Server error";
+  }
+};
+
 export const getRecommendedPosts = async (category: string, postId: string) => {
   try {
     const queryText =
@@ -100,11 +116,11 @@ export const getRecommendedPosts = async (category: string, postId: string) => {
     if (userPosts.length > 0) {
       return userPosts;
     } else {
-      return undefined;
+      return "Bad request";
     }
   } catch (error) {
     console.error("There was an error getting recommended posts: ", error);
-    return null;
+    return "Server error";
   }
 };
 
@@ -117,11 +133,11 @@ export const getPostById = async (postId: string) => {
     if (userPosts.length > 0) {
       return userPosts;
     } else {
-      return undefined;
+      return "Bad request";
     }
   } catch (error) {
     console.error("There was an error getting post by ID: ", error);
-    return null;
+    return "Server error";
   }
 };
 //===========================DELETE==============================
