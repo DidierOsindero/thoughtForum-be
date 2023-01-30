@@ -90,6 +90,22 @@ export const getAllUserPosts = async (userId: string) => {
   }
 };
 
+export const getFeaturedPosts = async () => {
+  try {
+    const queryText = "SELECT * FROM user_posts ORDER BY hearts DESC LIMIT 2";
+    const queryResponse = await client.query(queryText);
+    const userPosts = queryResponse.rows;
+    if (userPosts.length > 0) {
+      return userPosts;
+    } else {
+      return undefined;
+    }
+  } catch (error) {
+    console.error("There was an error getting featured posts: ", error);
+    return null;
+  }
+};
+
 export const getRecommendedPosts = async (category: string, postId: string) => {
   try {
     const queryText =

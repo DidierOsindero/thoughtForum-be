@@ -26,6 +26,7 @@ import {
   getAllSciencePosts,
   getAllThoughtPosts,
   getAllUserPosts,
+  getFeaturedPosts,
   getPostById,
   getRecommendedPosts,
   INewPostData,
@@ -84,6 +85,18 @@ app.get("/posts/art", async (req, res) => {
     res.status(400);
   }
   console.log("FINISH get /posts/art", new Date());
+});
+
+//--------------------------------------------------------------------Get Featured Posts
+app.get("/posts/feature", async (req, res) => {
+  console.log("get /posts/feature/", new Date());
+  const posts = await getFeaturedPosts();
+  if (posts) {
+    res.json(posts);
+  } else {
+    res.status(400);
+  }
+  console.log("FINISH get /posts/feature/", new Date());
 });
 //--------------------------------------------------------------------Get Recommended Posts by Category
 app.get<{ category: string; postid: string }>(
