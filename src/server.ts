@@ -168,6 +168,8 @@ app.get<{ id: string }>("/posts/:id", async (req, res) => {
 
 //============POST============
 
+//------------------------------------------------------------------------POST User Post
+
 app.post<{}, {}, INewPostData>("/write", async (req, res) => {
   console.log("Post to /write", new Date());
   const authenticationResult = await checkIsAuthenticated(req, res);
@@ -197,6 +199,8 @@ app.post<{}, {}, INewPostData>("/write", async (req, res) => {
 });
 
 //============DELETE============
+//------------------------------------------------------------------------DELETE User Post
+
 app.delete<{}, {}, {}, { postid: string }>(
   "/posts/profile",
   async (req, res) => {
