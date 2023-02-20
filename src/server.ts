@@ -41,7 +41,7 @@ const PORT_NUMBER = process.env.PORT ?? 4000;
 
 //============GET============
 
-//--------------------------------------------------------------------Get All Posts
+//--------------------------------------------------------------------GET All Posts
 app.get("/posts", async (req, res) => {
   console.log("GET all posts", new Date());
   const posts = await getAllPosts();
@@ -88,7 +88,7 @@ app.get("/posts/art", async (req, res) => {
   console.log("FINISH get /posts/art", new Date());
 });
 
-//--------------------------------------------------------------------Get Featured Posts
+//--------------------------------------------------------------------GET Featured Posts
 app.get("/posts/feature", async (req, res) => {
   console.log("get /posts/feature/", new Date());
   const response = await getFeaturedPosts();
@@ -103,28 +103,37 @@ app.get("/posts/feature", async (req, res) => {
   }
   console.log("FINISH get /posts/feature/", new Date());
 });
-//--------------------------------------------------------------------Get Recommended Posts by Category
+//--------------------------------------------------------------------GET Recommended Posts by Category
 app.get<{ category: string; postid: string }>(
   "/posts/recommend/:category/:postid",
   async (req, res) => {
     console.log("get /posts/recommend/:category", new Date());
+
+    let userId = null;
+    if (req.headers.authorization) {
+      const authenticationResult = await checkIsAuthenticated(req, res);
+      userId =
+        authenticationResult.authenticated &&
+        authenticationResult.decodedToken?.uid
+          ? authenticationResult.decodedToken?.uid
+          : null;
+    }
+
     const response = await getRecommendedPosts(
       req.params.category,
-      req.params.postid
+      req.params.postid,
+      userId
     );
-    if (response !== "Bad request" && response !== "Server error") {
+    if (response !== "Server error") {
       res.json(response);
-    } else if (response === "Bad request") {
-      console.log("Bad request to getting recommended posts.");
-      res.status(400).send("Bad request to getting recommended posts.");
     } else if (response === "Server error") {
       console.log("Server error when getting recommended posts.");
-      res.status(400).send("Server error when getting recommended posts.");
+      res.status(500).send("Server error when getting recommended posts.");
     }
     console.log("FINISH get /posts/recommend/:category", new Date());
   }
 );
-//--------------------------------------------------------------------Get Profile Posts
+//--------------------------------------------------------------------GET Profile Posts
 app.get("/posts/profile", async (req, res) => {
   console.log("get /profile/posts", new Date());
   const authenticationResult = await checkIsAuthenticated(req, res);
@@ -150,7 +159,7 @@ app.get("/posts/profile", async (req, res) => {
   }
   console.log("FINISH get /profile/posts", new Date());
 });
-//------------------------------------------------------------------------Get Posts by ID
+//------------------------------------------------------------------------GET Posts by ID
 app.get<{ id: string }>("/posts/:id", async (req, res) => {
   console.log("get /posts/:id", new Date());
   const response = await getPostById(req.params.id);
@@ -167,9 +176,7 @@ app.get<{ id: string }>("/posts/:id", async (req, res) => {
 });
 
 //============POST============
-
 //------------------------------------------------------------------------POST User Post
-
 app.post<{}, {}, INewPostData>("/write", async (req, res) => {
   console.log("Post to /write", new Date());
   const authenticationResult = await checkIsAuthenticated(req, res);

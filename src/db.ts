@@ -106,18 +106,22 @@ export const getFeaturedPosts = async () => {
   }
 };
 
-export const getRecommendedPosts = async (category: string, postId: string) => {
+export const getRecommendedPosts = async (
+  category: string,
+  postId: string,
+  userId: string | null
+) => {
   try {
     const queryText =
-      "SELECT * FROM user_posts WHERE category = $1 AND post_id != $2 AND privacy != 'private' ORDER BY hearts DESC LIMIT 10";
-    const queryValues = [category, postId];
+      userId !== null
+        ? "SELECT * FROM user_posts WHERE category = $1 AND post_id != $2 AND privacy != 'private' AND user_id != $3 ORDER BY hearts DESC LIMIT 10"
+        : "SELECT * FROM user_posts WHERE category = $1 AND post_id != $2 AND privacy != 'private' ORDER BY hearts DESC LIMIT 10";
+    const queryValues = userId
+      ? [category, postId, userId]
+      : [category, postId];
     const queryResponse = await client.query(queryText, queryValues);
     const userPosts = queryResponse.rows;
-    if (userPosts.length > 0) {
-      return userPosts;
-    } else {
-      return "Bad request";
-    }
+    return userPosts;
   } catch (error) {
     console.error("There was an error getting recommended posts: ", error);
     return "Server error";
