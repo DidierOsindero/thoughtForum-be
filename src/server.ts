@@ -41,6 +41,7 @@ const PORT_NUMBER = process.env.PORT ?? 4000;
 
 //============GET============
 
+//--------------------------------------------------------------------Get All Posts
 app.get("/posts", async (req, res) => {
   console.log("GET all posts", new Date());
   const posts = await getAllPosts();
@@ -90,7 +91,6 @@ app.get("/posts/art", async (req, res) => {
 //--------------------------------------------------------------------Get Featured Posts
 app.get("/posts/feature", async (req, res) => {
   console.log("get /posts/feature/", new Date());
-  console.log("This is running");
   const response = await getFeaturedPosts();
   if (response !== "Bad request" && response !== "Server error") {
     res.json(response);
