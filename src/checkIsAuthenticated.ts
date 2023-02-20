@@ -10,6 +10,7 @@ export async function checkIsAuthenticated(
   const potentialToken = req.headers.authorization;
 
   if (!potentialToken) {
+    console.log({ authenticated: false, message: "No token!" });
     return { authenticated: false, message: "No token!" };
   }
 
