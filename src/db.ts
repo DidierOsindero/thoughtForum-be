@@ -32,7 +32,7 @@ export interface INewPostData {
 //===========================GET==============================
 export const getAllPosts = async () => {
   try {
-    const queryText = "SELECT * FROM get_posts_with_username;";
+    const queryText = "SELECT * FROM user_posts_with_username;";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -44,7 +44,7 @@ export const getAllPosts = async () => {
 export const getAllThoughtPosts = async () => {
   try {
     const queryText =
-      "SELECT * FROM get_posts_with_username WHERE category = 'thought';";
+      "SELECT * FROM user_posts_with_username WHERE category = 'thought';";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -56,7 +56,7 @@ export const getAllThoughtPosts = async () => {
 export const getAllSciencePosts = async () => {
   try {
     const queryText =
-      "SELECT * FROM get_posts_with_username WHERE category = 'science';";
+      "SELECT * FROM user_posts_with_username WHERE category = 'science';";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -68,7 +68,7 @@ export const getAllSciencePosts = async () => {
 export const getAllArtPosts = async () => {
   try {
     const queryText =
-      "SELECT * FROM get_posts_with_username WHERE category = 'art';";
+      "SELECT * FROM user_posts_with_username WHERE category = 'art';";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -80,7 +80,7 @@ export const getAllArtPosts = async () => {
 export const getAllUserPosts = async (userId: string) => {
   try {
     const queryText =
-      "SELECT * FROM user_posts WHERE user_id = $1 ORDER BY creation_date DESC";
+      "SELECT * FROM user_posts_with_username WHERE user_id = $1 ORDER BY creation_date DESC";
     const queryValues = [userId];
     const queryResponse = await client.query(queryText, queryValues);
     const userPosts = queryResponse.rows;
@@ -92,7 +92,8 @@ export const getAllUserPosts = async (userId: string) => {
 
 export const getFeaturedPosts = async () => {
   try {
-    const queryText = "SELECT * FROM user_posts ORDER BY hearts DESC LIMIT 2";
+    const queryText =
+      "SELECT * FROM user_posts_with_username ORDER BY hearts DESC LIMIT 2";
     const queryResponse = await client.query(queryText);
     const userPosts = queryResponse.rows;
     if (userPosts.length > 0) {
@@ -114,8 +115,8 @@ export const getRecommendedPosts = async (
   try {
     const queryText =
       userId !== null
-        ? "SELECT * FROM user_posts WHERE category = $1 AND post_id != $2 AND privacy != 'private' AND user_id != $3 ORDER BY hearts DESC LIMIT 10"
-        : "SELECT * FROM user_posts WHERE category = $1 AND post_id != $2 AND privacy != 'private' ORDER BY hearts DESC LIMIT 10";
+        ? "SELECT * FROM user_posts_with_username WHERE category = $1 AND post_id != $2 AND privacy != 'private' AND user_id != $3 ORDER BY hearts DESC LIMIT 10"
+        : "SELECT * FROM user_posts_with_username WHERE category = $1 AND post_id != $2 AND privacy != 'private' ORDER BY hearts DESC LIMIT 10";
     const queryValues = userId
       ? [category, postId, userId]
       : [category, postId];
@@ -130,7 +131,8 @@ export const getRecommendedPosts = async (
 
 export const getPostById = async (postId: string) => {
   try {
-    const queryText = "SELECT * FROM user_posts WHERE post_id = $1";
+    const queryText =
+      "SELECT * FROM user_posts_with_username WHERE post_id = $1";
     const queryValues = [postId];
     const queryResponse = await client.query(queryText, queryValues);
     const userPosts = queryResponse.rows;
