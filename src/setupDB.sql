@@ -31,10 +31,11 @@ CREATE TABLE hearts(
 -- ------------------------------------------Comments Table
 DROP TABLE IF EXISTS comments;
 CREATE TABLE comments(
+  comment_id SERIAL PRIMARY KEY,
   user_id VARCHAR REFERENCES users(user_id),
   post_id INT REFERENCES user_posts(post_id),
   comment text,
-  PRIMARY KEY (user_id, post_id)
+  creation_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
   );
 
 -- ===========Create a view to get all public posts with the username of the author=========

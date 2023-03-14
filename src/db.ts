@@ -29,6 +29,17 @@ export interface INewPostData {
   privacy: PostPrivacy | null;
 }
 
+export interface INewCommentData {
+  post_id: string;
+  commentText: string;
+}
+
+export interface ICommentDataWithUsername {
+  text: string;
+  creation_date: string;
+  username: string;
+}
+
 //===========================GET==============================
 export const getAllPosts = async () => {
   try {
@@ -231,6 +242,25 @@ export const addNewPost = async (newPostData: INewPostData, userId: string) => {
   } catch (error) {
     console.error(
       "There was an error when adding a new post to the database:",
+      error
+    );
+  }
+};
+
+export const addNewComment = async (
+  userId: string,
+  postId: string,
+  newCommentTxt: string
+) => {
+  try {
+    const query =
+      "INSERT INTO comments (user_id, post_id, comment) VALUES ($1, $2, $3) RETURNING *";
+    const values = [userId, postId, newCommentTxt];
+    const createdComment = await client.query(query, values);
+    return createdComment;
+  } catch (error) {
+    console.error(
+      "There was an error when adding a new comment to the database:",
       error
     );
   }

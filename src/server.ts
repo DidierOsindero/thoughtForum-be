@@ -19,6 +19,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import {
+  addNewComment,
   addNewPost,
   deletePostById,
   getAllArtPosts,
@@ -29,6 +30,7 @@ import {
   getFeaturedPosts,
   getPostById,
   getRecommendedPosts,
+  INewCommentData,
   INewPostData,
 } from "./db";
 import { checkIsAuthenticated } from "./checkIsAuthenticated";
@@ -203,6 +205,39 @@ app.post<{}, {}, INewPostData>("/write", async (req, res) => {
     res.status(401).send({ message: authenticationResult.message });
   }
   console.log("FINISH Post to /write", new Date());
+});
+
+//------------------------------------------------------------------------POST User Comment
+app.post<{}, {}, INewCommentData>("/comments", async (req, res) => {
+  console.log("Post to /comments", new Date());
+  const authenticationResult = await checkIsAuthenticated(req, res);
+
+  //================Check if the user is verified by Firebase and has a userID================
+  if (
+    authenticationResult.authenticated &&
+    authenticationResult.decodedToken?.uid
+  ) {
+    try {
+      const userId = authenticationResult.decodedToken?.uid;
+      const createdComment = await addNewComment(
+        userId,
+        req.body.post_id,
+        req.body.commentText
+      );
+      res.json(createdComment?.rows[0]);
+    } catch (error) {
+      console.error(
+        "There was an error when posting a new comment to the database:",
+        error
+      );
+      res
+        .status(500)
+        .send("Token was verified but there was a server side error");
+    }
+  } else {
+    res.status(401).send({ message: authenticationResult.message });
+  }
+  console.log("FINISH Post to /comments", new Date());
 });
 
 //============DELETE============
