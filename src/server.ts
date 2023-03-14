@@ -27,6 +27,7 @@ import {
   getAllSciencePosts,
   getAllThoughtPosts,
   getAllUserPosts,
+  getCommentsByPost,
   getFeaturedPosts,
   getPostById,
   getRecommendedPosts,
@@ -172,9 +173,21 @@ app.get<{ id: string }>("/posts/:id", async (req, res) => {
     res.status(400).send("Bad request to get post by id, post does not exist.");
   } else if (response === "Server error") {
     console.log("Server error when getting post by id.");
-    res.status(400).send("Server error when getting post by id.");
+    res.status(500).send("Server error when getting post by id.");
   }
   console.log("FINISH get /posts/:id", new Date());
+});
+
+//------------------------------------------------------------------------GET Comments by post ID
+app.get<{ id: string }>("/posts/:id/comments", async (req, res) => {
+  console.log("Get /posts/comments", new Date());
+  const response = await getCommentsByPost(req.params.id);
+  if (response) {
+    res.json(response);
+  } else {
+    res.status(500).send("Server error when getting comments by post id.");
+  }
+  console.log("FINISH Get /posts/comments", new Date());
 });
 
 //============POST============
@@ -208,7 +221,7 @@ app.post<{}, {}, INewPostData>("/write", async (req, res) => {
 });
 
 //------------------------------------------------------------------------POST User Comment
-app.post<{}, {}, INewCommentData>("/comments", async (req, res) => {
+app.post<{}, {}, INewCommentData>("/posts/comments", async (req, res) => {
   console.log("Post to /comments", new Date());
   const authenticationResult = await checkIsAuthenticated(req, res);
 

@@ -157,6 +157,23 @@ export const getPostById = async (postId: string) => {
     return "Server error";
   }
 };
+
+export const getCommentsByPost = async (postId: string) => {
+  try {
+    const query = `SELECT comment_id, post_id, comment, creation_date, c.user_id, username 
+    FROM comments c 
+    JOIN users u ON c.user_id = u.user_id
+    WHERE post_id = $1;`;
+    const values = [postId];
+    const response = await client.query(query, values);
+    return response.rows;
+  } catch (error) {
+    console.error(
+      `There was an error getting comments for post ${postId}:`,
+      error
+    );
+  }
+};
 //===========================DELETE==============================
 export const deletePostById = async (postId: number) => {
   try {
