@@ -32,8 +32,8 @@ CREATE TABLE hearts(
 DROP TABLE IF EXISTS comments;
 CREATE TABLE comments(
   comment_id SERIAL PRIMARY KEY,
-  user_id VARCHAR REFERENCES users(user_id),
-  post_id INT REFERENCES user_posts(post_id),
+  user_id VARCHAR REFERENCES users(user_id) NOT NULL,
+  post_id INT REFERENCES user_posts(post_id) NOT NULL,
   comment text,
   creation_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
   );
