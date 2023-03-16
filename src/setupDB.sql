@@ -22,10 +22,9 @@ CREATE TABLE user_posts(
 -- ------------------------------------------Hearts Table
 DROP TABLE IF EXISTS hearts;
 CREATE TABLE hearts(
-  user_id VARCHAR REFERENCES users(user_id),
-  post_id INT REFERENCES user_posts(post_id),
-  hearted BOOLEAN,
-  PRIMARY KEY (user_id, post_id)
+  id SERIAL PRIMARY KEY,
+  user_id VARCHAR REFERENCES users(user_id) NOT NULL,
+  post_id INT REFERENCES user_posts(post_id) NOT NULL
   );
 
 -- ------------------------------------------Comments Table
