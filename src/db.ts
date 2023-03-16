@@ -284,3 +284,18 @@ export const addNewComment = async (
     );
   }
 };
+
+export const addNewHeart = async (userId: string, postId: string) => {
+  try {
+    const query =
+      "INSERT INTO hearts (user_id, post_id) VALUES ($1, $2) RETURNING *";
+    const values = [userId, postId];
+    const createdHeart = await client.query(query, values);
+    return createdHeart;
+  } catch (error) {
+    console.error(
+      "There was an error when adding a new heart to the database:",
+      error
+    );
+  }
+};

@@ -20,6 +20,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import {
   addNewComment,
+  addNewHeart,
   addNewPost,
   deletePostById,
   getAllArtPosts,
@@ -247,6 +248,31 @@ app.post<{}, {}, INewCommentData>("/posts/comments", async (req, res) => {
     res.status(401).send({ message: authenticationResult.message });
   }
   console.log("FINISH Post to /comments", new Date());
+});
+
+//------------------------------------------------------------------------POST User Heart
+app.post<{ post_id: string }>("/posts/:post_id/hearts", async (req, res) => {
+  console.log("Post to /posts/:post_id/hearts", new Date());
+  const authenticationResult = await checkIsAuthenticated(req, res);
+
+  //Check if the user is verified by Firebase and has a userID
+  if (
+    authenticationResult.authenticated &&
+    authenticationResult.decodedToken?.uid
+  ) {
+    const userId = authenticationResult.decodedToken?.uid;
+    const createdHeart = await addNewHeart(userId, req.params.post_id);
+    if (createdHeart) {
+      res.json(createdHeart?.rows[0]);
+    } else {
+      res
+        .status(500)
+        .send("Token was verified but there was a server side error");
+    }
+  } else {
+    res.status(401).send({ message: authenticationResult.message });
+  }
+  console.log("FINISH Post to /posts/:post_id/hearts", new Date());
 });
 
 //============DELETE============

@@ -24,7 +24,8 @@ DROP TABLE IF EXISTS hearts;
 CREATE TABLE hearts(
   id SERIAL PRIMARY KEY,
   user_id VARCHAR REFERENCES users(user_id) NOT NULL,
-  post_id INT REFERENCES user_posts(post_id) NOT NULL
+  post_id INT REFERENCES user_posts(post_id) NOT NULL, 
+  UNIQUE (user_id, post_id)
   );
 
 -- ------------------------------------------Comments Table
