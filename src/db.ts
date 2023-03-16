@@ -43,7 +43,8 @@ export interface ICommentDataWithUsername {
 //===========================GET==============================
 export const getAllPosts = async () => {
   try {
-    const queryText = "SELECT * FROM user_posts_with_username;";
+    const queryText =
+      "SELECT * FROM user_posts_with_username WHERE privacy = 'public';";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -55,7 +56,7 @@ export const getAllPosts = async () => {
 export const getAllThoughtPosts = async () => {
   try {
     const queryText =
-      "SELECT * FROM user_posts_with_username WHERE category = 'thought';";
+      "SELECT * FROM user_posts_with_username WHERE category = 'thought' AND privacy = 'public';";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -67,7 +68,7 @@ export const getAllThoughtPosts = async () => {
 export const getAllSciencePosts = async () => {
   try {
     const queryText =
-      "SELECT * FROM user_posts_with_username WHERE category = 'science';";
+      "SELECT * FROM user_posts_with_username WHERE category = 'science' AND privacy = 'public';";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -79,7 +80,7 @@ export const getAllSciencePosts = async () => {
 export const getAllArtPosts = async () => {
   try {
     const queryText =
-      "SELECT * FROM user_posts_with_username WHERE category = 'art';";
+      "SELECT * FROM user_posts_with_username WHERE category = 'art' AND privacy = 'public';";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -104,7 +105,7 @@ export const getAllUserPosts = async (userId: string) => {
 export const getFeaturedPosts = async () => {
   try {
     const queryText =
-      "SELECT * FROM user_posts_with_username ORDER BY hearts DESC LIMIT 2";
+      "SELECT * FROM user_posts_with_username WHERE privacy = 'public' ORDER BY hearts DESC LIMIT 2";
     const queryResponse = await client.query(queryText);
     const userPosts = queryResponse.rows;
     if (userPosts.length > 0) {
@@ -163,7 +164,8 @@ export const getCommentsByPost = async (postId: string) => {
     const query = `SELECT comment_id, post_id, comment, creation_date, c.user_id, username 
     FROM comments c 
     JOIN users u ON c.user_id = u.user_id
-    WHERE post_id = $1;`;
+    WHERE post_id = $1
+    ORDER BY creation_date DESC;`;
     const values = [postId];
     const response = await client.query(query, values);
     return response.rows;

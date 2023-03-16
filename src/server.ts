@@ -230,19 +230,15 @@ app.post<{}, {}, INewCommentData>("/posts/comments", async (req, res) => {
     authenticationResult.authenticated &&
     authenticationResult.decodedToken?.uid
   ) {
-    try {
-      const userId = authenticationResult.decodedToken?.uid;
-      const createdComment = await addNewComment(
-        userId,
-        req.body.post_id,
-        req.body.commentText
-      );
+    const userId = authenticationResult.decodedToken?.uid;
+    const createdComment = await addNewComment(
+      userId,
+      req.body.post_id,
+      req.body.commentText
+    );
+    if (createdComment) {
       res.json(createdComment?.rows[0]);
-    } catch (error) {
-      console.error(
-        "There was an error when posting a new comment to the database:",
-        error
-      );
+    } else {
       res
         .status(500)
         .send("Token was verified but there was a server side error");
