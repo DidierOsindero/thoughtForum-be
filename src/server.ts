@@ -192,8 +192,8 @@ app.get<{ id: string }>("/posts/:id/comments", async (req, res) => {
 
 //============POST============
 //------------------------------------------------------------------------POST User Post
-app.post<{}, {}, INewPostData>("/write", async (req, res) => {
-  console.log("Post to /write", new Date());
+app.post<{}, {}, INewPostData>("/posts", async (req, res) => {
+  console.log("Post to /posts", new Date());
   const authenticationResult = await checkIsAuthenticated(req, res);
 
   //================Check if the user is verified by Firebase and has a userID================
@@ -217,7 +217,7 @@ app.post<{}, {}, INewPostData>("/write", async (req, res) => {
   } else {
     res.status(401).send({ message: authenticationResult.message });
   }
-  console.log("FINISH Post to /write", new Date());
+  console.log("FINISH Post to /posts", new Date());
 });
 
 //------------------------------------------------------------------------POST User Comment
