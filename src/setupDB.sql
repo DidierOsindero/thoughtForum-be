@@ -39,8 +39,24 @@ CREATE TABLE comments(
   );
 
 -- ===========Create a view to get all public posts with the username of the author=========
+-- DROP VIEW IF EXISTS user_posts_with_username;
+-- CREATE VIEW user_posts_with_username AS
+-- SELECT posts.post_id, posts.user_id, posts.title, posts.content, posts.img, posts.category, posts.privacy, posts.creation_date, users.username
+-- FROM user_posts posts
+-- JOIN users ON posts.user_id = users.user_id
+-- ORDER BY creation_date DESC;
+
+-- This is the user posts with username and hearts count for each post
 CREATE VIEW user_posts_with_username AS
-SELECT posts.post_id, posts.user_id, posts.title, posts.content, posts.img, posts.category, posts.privacy, posts.hearts, posts.creation_date, users.username
+SELECT posts.post_id, posts.user_id, posts.title, posts.content, posts.img, posts.category, posts.privacy, posts.creation_date, users.username, COALESCE(sub_query.hearts, 0) AS hearts
 FROM user_posts posts
 JOIN users ON posts.user_id = users.user_id
+LEFT JOIN (
+  		SELECT h.post_id, COUNT(*) AS hearts
+		FROM user_posts u
+		RIGHT JOIN hearts h 
+		ON h.post_id = u.post_id
+  		GROUP BY h.post_id
+  	) AS sub_query
+ON sub_query.post_id = posts.post_id
 ORDER BY creation_date DESC;
