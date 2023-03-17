@@ -299,3 +299,18 @@ export const addNewHeart = async (userId: string, postId: string) => {
     );
   }
 };
+
+export const deleteNewHeart = async (userId: string, postId: string) => {
+  try {
+    const query =
+      "DELETE FROM hearts WHERE user_id = $1 AND post_id = $2 RETURNING *";
+    const values = [userId, postId];
+    const deletedHeart = await client.query(query, values);
+    return deletedHeart;
+  } catch (error) {
+    console.error(
+      "There was an error when adding a new heart to the database:",
+      error
+    );
+  }
+};

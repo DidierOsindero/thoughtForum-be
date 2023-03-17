@@ -22,6 +22,7 @@ import {
   addNewComment,
   addNewHeart,
   addNewPost,
+  deleteNewHeart,
   deletePostById,
   getAllArtPosts,
   getAllPosts,
@@ -296,6 +297,31 @@ app.delete<{}, {}, {}, { postid: string }>(
     console.log("FINISH delete /profile/posts", new Date());
   }
 );
+
+//------------------------------------------------------------------------DELETE User Heart
+app.delete<{ post_id: string }>("/posts/:post_id/hearts", async (req, res) => {
+  console.log("Delete to /posts/:post_id/hearts", new Date());
+  const authenticationResult = await checkIsAuthenticated(req, res);
+
+  //Check if the user is verified by Firebase and has a userID
+  if (
+    authenticationResult.authenticated &&
+    authenticationResult.decodedToken?.uid
+  ) {
+    const userId = authenticationResult.decodedToken?.uid;
+    const createdHeart = await deleteNewHeart(userId, req.params.post_id);
+    if (createdHeart) {
+      res.json(createdHeart?.rows[0]);
+    } else {
+      res
+        .status(500)
+        .send("Token was verified but there was a server side error");
+    }
+  } else {
+    res.status(401).send({ message: authenticationResult.message });
+  }
+  console.log("FINISH Delete to /posts/:post_id/hearts", new Date());
+});
 
 app.listen(PORT_NUMBER, () => {
   console.log(`Server is listening on port ${PORT_NUMBER}!`);
