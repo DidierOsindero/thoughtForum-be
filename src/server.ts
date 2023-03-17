@@ -31,6 +31,7 @@ import {
   getAllUserPosts,
   getCommentsByPost,
   getFeaturedPosts,
+  getHeartsByPost,
   getPostById,
   getRecommendedPosts,
   INewCommentData,
@@ -190,6 +191,32 @@ app.get<{ id: string }>("/posts/:id/comments", async (req, res) => {
     res.status(500).send("Server error when getting comments by post id.");
   }
   console.log("FINISH Get /posts/comments", new Date());
+});
+
+//------------------------------------------------------------------------GET hearts by post ID
+app.get<{ id: string }>("/posts/:id/hearts", async (req, res) => {
+  console.log("get /posts/:id/hearts", new Date());
+  const authenticationResult = await checkIsAuthenticated(req, res);
+
+  //================Check if the user is verified by Firebase and has a userID================
+  if (
+    authenticationResult.authenticated &&
+    authenticationResult.decodedToken?.uid
+  ) {
+    const userId = authenticationResult.decodedToken?.uid;
+    const response: boolean | undefined = await getHeartsByPost(
+      userId,
+      req.params.id
+    );
+    if (response !== undefined) {
+      res.json(response);
+    } else {
+      res.status(500).send("Server error when getting hearts by post id.");
+    }
+  } else {
+    res.status(401).send({ message: authenticationResult.message });
+  }
+  console.log("FINISH get /posts/:id/hearts", new Date());
 });
 
 //============POST============

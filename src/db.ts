@@ -176,6 +176,22 @@ export const getCommentsByPost = async (postId: string) => {
     );
   }
 };
+
+export const getHeartsByPost = async (userId: string, postId: string) => {
+  try {
+    const query = `SELECT * FROM hearts WHERE user_id = $1 AND post_id = $2`;
+    const values = [userId, postId];
+    const response = await client.query(query, values);
+
+    if (response.rows[0]) return true;
+    return false;
+  } catch (error) {
+    console.error(
+      `There was an error getting current users heart for post ${postId}:`,
+      error
+    );
+  }
+};
 //===========================DELETE==============================
 export const deletePostById = async (postId: number) => {
   try {
