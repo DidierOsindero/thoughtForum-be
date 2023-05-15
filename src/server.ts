@@ -19,16 +19,22 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import {
+  addNewComment,
+  addNewHeart,
   addNewPost,
+  deleteNewHeart,
   deletePostById,
   getAllArtPosts,
   getAllPosts,
   getAllSciencePosts,
   getAllThoughtPosts,
   getAllUserPosts,
+  getCommentsByPost,
   getFeaturedPosts,
+  getHeartsByPost,
   getPostById,
   getRecommendedPosts,
+  INewCommentData,
   INewPostData,
 } from "./db";
 import { checkIsAuthenticated } from "./checkIsAuthenticated";
@@ -170,15 +176,53 @@ app.get<{ id: string }>("/posts/:id", async (req, res) => {
     res.status(400).send("Bad request to get post by id, post does not exist.");
   } else if (response === "Server error") {
     console.log("Server error when getting post by id.");
-    res.status(400).send("Server error when getting post by id.");
+    res.status(500).send("Server error when getting post by id.");
   }
   console.log("FINISH get /posts/:id", new Date());
 });
 
+//------------------------------------------------------------------------GET Comments by post ID
+app.get<{ id: string }>("/posts/:id/comments", async (req, res) => {
+  console.log("Get /posts/comments", new Date());
+  const response = await getCommentsByPost(req.params.id);
+  if (response) {
+    res.json(response);
+  } else {
+    res.status(500).send("Server error when getting comments by post id.");
+  }
+  console.log("FINISH Get /posts/comments", new Date());
+});
+
+//------------------------------------------------------------------------GET hearts by post ID
+app.get<{ id: string }>("/posts/:id/hearts", async (req, res) => {
+  console.log("get /posts/:id/hearts", new Date());
+  const authenticationResult = await checkIsAuthenticated(req, res);
+
+  //================Check if the user is verified by Firebase and has a userID================
+  if (
+    authenticationResult.authenticated &&
+    authenticationResult.decodedToken?.uid
+  ) {
+    const userId = authenticationResult.decodedToken?.uid;
+    const response: boolean | undefined = await getHeartsByPost(
+      userId,
+      req.params.id
+    );
+    if (response !== undefined) {
+      res.json(response);
+    } else {
+      res.status(500).send("Server error when getting hearts by post id.");
+    }
+  } else {
+    res.status(401).send({ message: authenticationResult.message });
+  }
+  console.log("FINISH get /posts/:id/hearts", new Date());
+});
+
 //============POST============
 //------------------------------------------------------------------------POST User Post
-app.post<{}, {}, INewPostData>("/write", async (req, res) => {
-  console.log("Post to /write", new Date());
+app.post<{}, {}, INewPostData>("/posts", async (req, res) => {
+  console.log("Post to /posts", new Date());
   const authenticationResult = await checkIsAuthenticated(req, res);
 
   //================Check if the user is verified by Firebase and has a userID================
@@ -202,7 +246,61 @@ app.post<{}, {}, INewPostData>("/write", async (req, res) => {
   } else {
     res.status(401).send({ message: authenticationResult.message });
   }
-  console.log("FINISH Post to /write", new Date());
+  console.log("FINISH Post to /posts", new Date());
+});
+
+//------------------------------------------------------------------------POST User Comment
+app.post<{}, {}, INewCommentData>("/posts/comments", async (req, res) => {
+  console.log("Post to /comments", new Date());
+  const authenticationResult = await checkIsAuthenticated(req, res);
+
+  //================Check if the user is verified by Firebase and has a userID================
+  if (
+    authenticationResult.authenticated &&
+    authenticationResult.decodedToken?.uid
+  ) {
+    const userId = authenticationResult.decodedToken?.uid;
+    const createdComment = await addNewComment(
+      userId,
+      req.body.post_id,
+      req.body.commentText
+    );
+    if (createdComment) {
+      res.json(createdComment?.rows[0]);
+    } else {
+      res
+        .status(500)
+        .send("Token was verified but there was a server side error");
+    }
+  } else {
+    res.status(401).send({ message: authenticationResult.message });
+  }
+  console.log("FINISH Post to /comments", new Date());
+});
+
+//------------------------------------------------------------------------POST User Heart
+app.post<{ post_id: string }>("/posts/:post_id/hearts", async (req, res) => {
+  console.log("Post to /posts/:post_id/hearts", new Date());
+  const authenticationResult = await checkIsAuthenticated(req, res);
+
+  //Check if the user is verified by Firebase and has a userID
+  if (
+    authenticationResult.authenticated &&
+    authenticationResult.decodedToken?.uid
+  ) {
+    const userId = authenticationResult.decodedToken?.uid;
+    const createdHeart = await addNewHeart(userId, req.params.post_id);
+    if (createdHeart) {
+      res.json(createdHeart?.rows[0]);
+    } else {
+      res
+        .status(500)
+        .send("Token was verified but there was a server side error");
+    }
+  } else {
+    res.status(401).send({ message: authenticationResult.message });
+  }
+  console.log("FINISH Post to /posts/:post_id/hearts", new Date());
 });
 
 //============DELETE============
@@ -226,6 +324,31 @@ app.delete<{}, {}, {}, { postid: string }>(
     console.log("FINISH delete /profile/posts", new Date());
   }
 );
+
+//------------------------------------------------------------------------DELETE User Heart
+app.delete<{ post_id: string }>("/posts/:post_id/hearts", async (req, res) => {
+  console.log("Delete to /posts/:post_id/hearts", new Date());
+  const authenticationResult = await checkIsAuthenticated(req, res);
+
+  //Check if the user is verified by Firebase and has a userID
+  if (
+    authenticationResult.authenticated &&
+    authenticationResult.decodedToken?.uid
+  ) {
+    const userId = authenticationResult.decodedToken?.uid;
+    const createdHeart = await deleteNewHeart(userId, req.params.post_id);
+    if (createdHeart) {
+      res.json(createdHeart?.rows[0]);
+    } else {
+      res
+        .status(500)
+        .send("Token was verified but there was a server side error");
+    }
+  } else {
+    res.status(401).send({ message: authenticationResult.message });
+  }
+  console.log("FINISH Delete to /posts/:post_id/hearts", new Date());
+});
 
 app.listen(PORT_NUMBER, () => {
   console.log(`Server is listening on port ${PORT_NUMBER}!`);

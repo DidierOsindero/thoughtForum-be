@@ -29,10 +29,22 @@ export interface INewPostData {
   privacy: PostPrivacy | null;
 }
 
+export interface INewCommentData {
+  post_id: string;
+  commentText: string;
+}
+
+export interface ICommentDataWithUsername {
+  text: string;
+  creation_date: string;
+  username: string;
+}
+
 //===========================GET==============================
 export const getAllPosts = async () => {
   try {
-    const queryText = "SELECT * FROM user_posts_with_username;";
+    const queryText =
+      "SELECT * FROM user_posts_with_username WHERE privacy = 'public';";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -44,7 +56,7 @@ export const getAllPosts = async () => {
 export const getAllThoughtPosts = async () => {
   try {
     const queryText =
-      "SELECT * FROM user_posts_with_username WHERE category = 'thought';";
+      "SELECT * FROM user_posts_with_username WHERE category = 'thought' AND privacy = 'public';";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -56,7 +68,7 @@ export const getAllThoughtPosts = async () => {
 export const getAllSciencePosts = async () => {
   try {
     const queryText =
-      "SELECT * FROM user_posts_with_username WHERE category = 'science';";
+      "SELECT * FROM user_posts_with_username WHERE category = 'science' AND privacy = 'public';";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -68,7 +80,7 @@ export const getAllSciencePosts = async () => {
 export const getAllArtPosts = async () => {
   try {
     const queryText =
-      "SELECT * FROM user_posts_with_username WHERE category = 'art';";
+      "SELECT * FROM user_posts_with_username WHERE category = 'art' AND privacy = 'public';";
     const queryResponse = await client.query(queryText);
     const posts = queryResponse.rows;
     return posts;
@@ -93,7 +105,7 @@ export const getAllUserPosts = async (userId: string) => {
 export const getFeaturedPosts = async () => {
   try {
     const queryText =
-      "SELECT * FROM user_posts_with_username ORDER BY hearts DESC LIMIT 2";
+      "SELECT * FROM user_posts_with_username WHERE privacy = 'public' ORDER BY hearts DESC LIMIT 2";
     const queryResponse = await client.query(queryText);
     const userPosts = queryResponse.rows;
     if (userPosts.length > 0) {
@@ -144,6 +156,40 @@ export const getPostById = async (postId: string) => {
   } catch (error) {
     console.error("There was an error getting post by ID: ", error);
     return "Server error";
+  }
+};
+
+export const getCommentsByPost = async (postId: string) => {
+  try {
+    const query = `SELECT comment_id, post_id, comment, creation_date, c.user_id, username 
+    FROM comments c 
+    JOIN users u ON c.user_id = u.user_id
+    WHERE post_id = $1
+    ORDER BY creation_date DESC;`;
+    const values = [postId];
+    const response = await client.query(query, values);
+    return response.rows;
+  } catch (error) {
+    console.error(
+      `There was an error getting comments for post ${postId}:`,
+      error
+    );
+  }
+};
+
+export const getHeartsByPost = async (userId: string, postId: string) => {
+  try {
+    const query = `SELECT * FROM hearts WHERE user_id = $1 AND post_id = $2`;
+    const values = [userId, postId];
+    const response = await client.query(query, values);
+
+    if (response.rows[0]) return true;
+    return false;
+  } catch (error) {
+    console.error(
+      `There was an error getting current users heart for post ${postId}:`,
+      error
+    );
   }
 };
 //===========================DELETE==============================
@@ -231,6 +277,55 @@ export const addNewPost = async (newPostData: INewPostData, userId: string) => {
   } catch (error) {
     console.error(
       "There was an error when adding a new post to the database:",
+      error
+    );
+  }
+};
+
+export const addNewComment = async (
+  userId: string,
+  postId: string,
+  newCommentTxt: string
+) => {
+  try {
+    const query =
+      "INSERT INTO comments (user_id, post_id, comment) VALUES ($1, $2, $3) RETURNING *";
+    const values = [userId, postId, newCommentTxt];
+    const createdComment = await client.query(query, values);
+    return createdComment;
+  } catch (error) {
+    console.error(
+      "There was an error when adding a new comment to the database:",
+      error
+    );
+  }
+};
+
+export const addNewHeart = async (userId: string, postId: string) => {
+  try {
+    const query =
+      "INSERT INTO hearts (user_id, post_id) VALUES ($1, $2) RETURNING *";
+    const values = [userId, postId];
+    const createdHeart = await client.query(query, values);
+    return createdHeart;
+  } catch (error) {
+    console.error(
+      "There was an error when adding a new heart to the database:",
+      error
+    );
+  }
+};
+
+export const deleteNewHeart = async (userId: string, postId: string) => {
+  try {
+    const query =
+      "DELETE FROM hearts WHERE user_id = $1 AND post_id = $2 RETURNING *";
+    const values = [userId, postId];
+    const deletedHeart = await client.query(query, values);
+    return deletedHeart;
+  } catch (error) {
+    console.error(
+      "There was an error when adding a new heart to the database:",
       error
     );
   }
